@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<!-- 문서 유형(DOCTYPE) 선언: 최신 HTML5 표준 규격을 따름을 브라우저에 명시합니다. -->
+<html lang="ko">
+<!-- <html>: 루트 요소이며 lang="ko"는 페이지 언어가 한국어임을 나타냅니다. -->
+<head>
+    <!-- <head>: 페이지의 메타데이터 및 스타일을 설정합니다. -->
+    <meta charset="UTF-8">
+    <!-- <meta charset="UTF-8">: 한글 및 특수문자가 깨지지 않도록 UTF-8 인코딩을 지정합니다. -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- <meta name="viewport">: 모바일/태블릿/PC 전 기기에서 최적 배율로 반응형 표시되도록 설정합니다. -->
+    <title>☕ 바이브 카페 주문서 | Vibe Coffee</title>
+    <!-- <title>: 브라우저 탭에 표시되는 페이지 제목입니다. -->
+
+    <!-- 
+        [DESIGN-starbucks.md 기반 디자인 시스템]
+        스타벅스 브랜드 고유의 컬러 토큰, 50px Full-Pill 버튼, 12px 카드 곡률, 
+        Whisper-soft 섀도우, 웜 크림 캔버스(#f2f0eb), Floating Frap 원형 버튼을 완벽 적용했습니다.
+    -->
+    <style>
+        /* 1. 디자인 시스템 토큰 변수 정의 (DESIGN-starbucks.md 규격) */
+        :root {
+            /* 스타벅스 4단계 그린 시스템 */
+            --sb-green: #006241;          /* Starbucks Green: 브랜드 헤딩 및 시그니처 강조 */
+            --sb-green-accent: #00754A;   /* Green Accent: 주요 Filled CTA 버튼, 활성 링 */
+            --sb-house-green: #1E3932;    /* House Green: 헤더/푸터 및 다크 피처 밴드 */
+            --sb-green-uplift: #2b5148;   /* Green Uplift: 보조 그린 */
+            --sb-green-light: #d4e9e2;    /* Green Light: 유효/선택 필드 틴트 배경 */
+
+            /* 골드 리워드 시스템 */
+            --sb-gold: #cba258;           /* Gold: 리워드 별점 및 프리미엄 뱃지 */
+            --sb-gold-lightest: #faf6ee;  /* Gold Lightest: 부드러운 웜 골드 서피스 */
+
+            /* 서피스 & 배경 */
+            --sb-canvas: #f2f0eb;         /* Neutral Warm: 따뜻한 크림톤 페이지 캔버스 (Cold White 배제) */
+            --sb-card-bg: #ffffff;        /* White: 카드 및 입력창 기본 배경 */
+            --sb-ceramic: #edebe9;        /* Ceramic: 구분선 및 보조 서피스 */
+
+            /* 텍스트 & 경계선 (순수 블랙 대신 따뜻한 87% 텍스트 블랙 적용) */
+            --sb-text-black: rgba(0, 0, 0, 0.87);
+            --sb-text-black-soft: rgba(0, 0, 0, 0.58);
+            --sb-border: #d6dbde;
+            --sb-border-focus: #00754A;
+
+            /* 라운딩 & 섀도우 */
+            --sb-radius-pill: 50px;       /* 스타벅스 시그니처 50px 전면 알약형(Pill) 곡률 */
+            --sb-radius-card: 12px;       /* 카드 및 모달 12px 곡률 */
+            --sb-card-shadow: 0 0 0.5px rgba(0, 0, 0, 0.14), 0 1px 2px rgba(0, 0, 0, 0.18);
+            --sb-frap-shadow: 0 0 6px rgba(0, 0, 0, 0.24), 0 8px 16px rgba(0, 0, 0, 0.16);
+            --sb-nav-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 2px 2px rgba(0, 0, 0, 0.06);
+        }
+
+        /* 2. 전역 리셋 & 기본 타이포그래피 */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--sb-canvas);
+            color: var(--sb-text-black);
+            font-family: 'SoDoSans', -apple-system, BlinkMacSystemFont, 'Pretendard', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            letter-spacing: -0.01em; /* 스타벅스 특유의 타이트한 자간(-0.16px) */
+            line-height: 1.5;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 3. 상단 글로벌 내비게이션 바 (House Green #1E3932) */
+        .sb-header {
+            background-color: var(--sb-house-green);
+            color: #ffffff;
+            box-shadow: var(--sb-nav-shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .sb-nav-inner {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .sb-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+            font-size: 1.15rem;
+            color: #ffffff;
+            text-decoration: none;
+            letter-spacing: -0.02em;
+        }
+
+        .sb-brand-logo {
+            width: 38px;
+            height: 38px;
+            background-color: #ffffff;
+            color: var(--sb-house-green);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            font-weight: 900;
+        }
+
+        .sb-rewards-badge {
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--sb-gold);
+            color: var(--sb-gold);
+            padding: 4px 14px;
+            border-radius: var(--sb-radius-pill);
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* 4. 메인 컨테이너 */
+        .sb-main {
+            flex: 1;
+            max-width: 760px;
+            width: 100%;
+            margin: 36px auto;
+            padding: 0 20px 80px 20px;
+        }
+
+        /* 헤더 타이틀 밴드 */
+        .sb-page-intro {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .sb-page-intro h1 {
+            color: var(--sb-green);
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: -0.02em;
+        }
+
+        .sb-page-intro p {
+            color: var(--sb-text-black-soft);
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        .sb-highlight-pill {
+            display: inline-block;
+            background-color: var(--sb-green-light);
+            color: var(--sb-house-green);
+            font-size: 0.82rem;
+            font-weight: 600;
+            padding: 4px 14px;
+            border-radius: var(--sb-radius-pill);
+            margin-top: 8px;
+        }
+
+        /* 5. 주문서 카드 래퍼 (White Card, 12px radius, Soft shadow) */
+        .sb-card {
+            background-color: var(--sb-card-bg);
+            border-radius: var(--sb-radius-card);
+            box-shadow: var(--sb-card-shadow);
+            padding: 36px 32px;
+            margin-bottom: 24px;
+            border: 1px solid rgba(0, 0, 0, 0.04);
+        }
+
+        /* 폼 내부 필드 그룹 */
+        .sb-field-group {
+            margin-bottom: 26px;
+        }
+
+        .sb-field-group:last-child {
+            margin-bottom: 0;
+        }
+
+        /* 라벨 스타일 */
+        .sb-label {
+            display: block;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--sb-text-black);
+            margin-bottom: 8px;
+        }
+
+        .sb-required-tag {
+            color: #c82014; /* 스타벅스 에러/필수 레드 */
+            font-size: 0.85rem;
+            margin-left: 4px;
+        }
+
+        .sb-field-helper {
+            font-size: 0.82rem;
+            color: var(--sb-text-black-soft);
+            margin-top: 5px;
+        }
+
+        /* 입력 인풋 & 셀렉트 & 텍스트에어리어 기본 스타일 */
+        .sb-input,
+        .sb-select,
+        .sb-textarea {
+            width: 100%;
+            padding: 13px 16px;
+            font-size: 1rem;
+            color: var(--sb-text-black);
+            background-color: #ffffff;
+            border: 1px solid var(--sb-border);
+            border-radius: 8px;
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            font-family: inherit;
+        }
+
+        .sb-input::placeholder,
+        .sb-textarea::placeholder {
+            color: #a0a6aa;
+            font-size: 0.93rem;
+        }
+
+        .sb-input:focus,
+        .sb-select:focus,
+        .sb-textarea:focus {
+            border-color: var(--sb-border-focus);
+            box-shadow: 0 0 0 3px rgba(0, 117, 74, 0.12);
+        }
+
+        .sb-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        /* 6. 스타벅스 PDP 스타일 사이즈 선택기 (라디오 카드) */
+        .sb-fieldset {
+            border: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sb-legend {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--sb-text-black);
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .sb-size-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+
+        /* 라디오 버튼 숨김 & 카드 라벨 스타일링 */
+        .sb-size-option {
+            position: relative;
+        }
+
+        .sb-size-option input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .sb-size-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 16px 10px;
+            background-color: #ffffff;
+            border: 1.5px solid var(--sb-border);
+            border-radius: 12px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+
+        .sb-size-icon {
+            font-size: 1.6rem;
+            margin-bottom: 6px;
+            transition: transform 0.2s ease;
+        }
+
+        .sb-size-name {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--sb-text-black);
+        }
+
+        .sb-size-desc {
+            font-size: 0.78rem;
+            color: var(--sb-text-black-soft);
+            margin-top: 2px;
+        }
+
+        /* 라디오 선택 상태: Green Accent 링 + 연한 그린 틴트 */
+        .sb-size-option input[type="radio"]:checked + .sb-size-card {
+            border-color: var(--sb-green-accent);
+            background-color: rgba(212, 233, 226, 0.35);
+            box-shadow: 0 0 0 1px var(--sb-green-accent);
+        }
+
+        .sb-size-option input[type="radio"]:checked + .sb-size-card .sb-size-name {
+            color: var(--sb-green);
+        }
+
+        .sb-size-option input[type="radio"]:checked + .sb-size-card .sb-size-icon {
+            transform: scale(1.1);
+        }
+
+        /* 7. 구분선 (Ceramic #edebe9) */
+        .sb-divider {
+            border: none;
+            height: 1px;
+            background-color: var(--sb-ceramic);
+            margin: 30px 0;
+        }
+
+        /* 8. 스타벅스 시그니처 50px Full-Pill 버튼들 */
+        .sb-btn-row {
+            display: flex;
+            gap: 14px;
+            align-items: center;
+        }
+
+        .sb-btn {
+            font-family: inherit;
+            font-size: 0.95rem;
+            font-weight: 700;
+            padding: 12px 28px;
+            border-radius: var(--sb-radius-pill); /* 스타벅스 50px 풀필 */
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            letter-spacing: -0.01em;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+        /* 스타벅스 특유의 시그니처 Active 피드백 (scale 0.95) */
+        .sb-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* 1) 주요 CTA (Green Accent Filled #00754A) */
+        .sb-btn-primary {
+            background-color: var(--sb-green-accent);
+            color: #ffffff;
+            border: 1px solid var(--sb-green-accent);
+            flex: 2;
+        }
+
+        .sb-btn-primary:hover {
+            background-color: var(--sb-green);
+            border-color: var(--sb-green);
+        }
+
+        /* 2) 보조 아웃라인 버튼 (Dark Outlined) */
+        .sb-btn-secondary {
+            background-color: transparent;
+            color: var(--sb-text-black);
+            border: 1px solid var(--sb-text-black);
+            flex: 1;
+        }
+
+        .sb-btn-secondary:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        /* 3) 그린 아웃라인 버튼 (Primary Outlined) */
+        .sb-btn-outline-green {
+            background-color: transparent;
+            color: var(--sb-green-accent);
+            border: 1.5px solid var(--sb-green-accent);
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .sb-btn-outline-green:hover {
+            background-color: rgba(0, 117, 74, 0.06);
+        }
+
+        /* 4) 위험/초기화 아웃라인 버튼 */
+        .sb-btn-text-danger {
+            background: none;
+            border: none;
+            color: #c82014;
+            font-size: 0.85rem;
+            cursor: pointer;
+            padding: 6px;
+            text-decoration: underline;
+        }
+
+        /* 9. 하단 유틸리티 카드 */
+        .sb-utility-card {
+            background-color: #ffffff;
+            border-radius: var(--sb-radius-card);
+            box-shadow: var(--sb-card-shadow);
+            padding: 24px 28px;
+            text-align: center;
+        }
+
+        .sb-utility-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--sb-house-green);
+            margin-bottom: 6px;
+        }
+
+        .sb-utility-desc {
+            font-size: 0.86rem;
+            color: var(--sb-text-black-soft);
+            margin-bottom: 16px;
+        }
+
+        /* 10. 스타벅스 시그니처 Frap 플로팅 원형 주문 버튼 (우측 하단) */
+        .sb-frap-btn {
+            position: fixed;
+            bottom: 28px;
+            right: 28px;
+            width: 58px;
+            height: 58px;
+            border-radius: 50%;
+            background-color: var(--sb-green-accent);
+            color: #ffffff;
+            border: none;
+            box-shadow: var(--sb-frap-shadow);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            z-index: 999;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .sb-frap-btn:hover {
+            transform: scale(1.06);
+            background-color: var(--sb-green);
+        }
+
+        .sb-frap-btn:active {
+            transform: scale(0.94);
+        }
+
+        /* 11. 푸터 (House Green #1E3932) */
+        .sb-footer {
+            background-color: var(--sb-house-green);
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.85rem;
+            text-align: center;
+            padding: 28px 20px;
+            margin-top: auto;
+        }
+
+        .sb-footer p {
+            margin-bottom: 6px;
+        }
+
+        .sb-footer-highlight {
+            color: var(--sb-gold);
+            font-weight: 600;
+        }
+
+        /* 반응형 모바일 최적화 (< 600px) */
+        @media (max-width: 600px) {
+            .sb-card {
+                padding: 24px 20px;
+            }
+            .sb-btn-row {
+                flex-direction: column;
+            }
+            .sb-btn {
+                width: 100%;
+            }
+            .sb-frap-btn {
+                bottom: 20px;
+                right: 20px;
+                width: 52px;
+                height: 52px;
+                font-size: 1.4rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 
+        [상단 글로벌 내비게이션 바]
+        스타벅스 House Green(#1E3932)을 사용하여 클래식하고 차분한 무드를 연출합니다.
+    -->
+    <header class="sb-header">
+        <div class="sb-nav-inner">
+            <a href="#" class="sb-brand">
+                <span class="sb-brand-logo">☕</span>
+                <span>VIBE COFFEE</span>
+            </a>
+            <div class="sb-rewards-badge">
+                <span>★</span>
+                <span>Rewards 200★</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- [메인 주문 컨테이너] 웜 크림 캔버스(#f2f0eb) 위에 화이트 카드 배치 -->
+    <main class="sb-main">
+
+        <!-- 페이지 인트로 헤더 -->
+        <div class="sb-page-intro">
+            <h1>☕ 바이브 카페 주문서</h1>
+            <p>신선한 원두와 정성으로 내린 음료를 주문해 보세요.<br>주문서를 작성하시면 <strong>엑셀 파일로 주문 내역이 즉시 저장</strong>됩니다.</p>
+            <span class="sb-highlight-pill">✓ Excel 자동 연동 지원</span>
+        </div>
+
+        <!-- 
+            [주문서 폼 카드]
+            <form>: 사용자가 입력한 주문 정보를 수집하고 엑셀 파일로 저장 및 서버 전송을 수행합니다.
+        -->
+        <form id="order-form" class="sb-card" action="#" method="post">
+
+            <!-- 1. 이름 입력 항목 (한 줄 텍스트 / 필수 입력) -->
+            <div class="sb-field-group">
+                <!-- <label>: 이름 입력 필드와 연결된 라벨 태그 -->
+                <label for="customer-name" class="sb-label">
+                    1. 고객명 <span class="sb-required-tag">* 필수</span>
+                </label>
+                <!-- 
+                    <input type="text">: 한 줄 텍스트 입력
+                    - required: 미입력 시 브라우저가 제출을 방지합니다.
+                    - placeholder: 사용자에게 입력 예시를 안내합니다.
+                -->
+                <input type="text" id="customer-name" name="customerName" class="sb-input" placeholder="성함을 입력해 주세요 (예: 홍길동)" required>
+                <div class="sb-field-helper">주문하신 음료가 준비되면 컵에 기재해 드립니다.</div>
+            </div>
+
+            <!-- 2. 전화번호 입력 항목 -->
+            <div class="sb-field-group">
+                <!-- <label>: 전화번호 입력 필드와 연결된 라벨 -->
+                <label for="customer-phone" class="sb-label">
+                    2. 연락처 (전화번호)
+                </label>
+                <!-- 
+                    <input type="tel">: 전화번호 전용 입력 필드 (모바일 숫자 키패드 지원)
+                -->
+                <input type="tel" id="customer-phone" name="customerPhone" class="sb-input" placeholder="연락처를 입력해 주세요 (예: 010-1234-5678)">
+                <div class="sb-field-helper">준비 완료 알림 및 영수증 전송에 사용됩니다.</div>
+            </div>
+
+            <!-- 3. 음료 선택 드롭다운 항목 -->
+            <div class="sb-field-group">
+                <!-- <label>: 음료 드롭다운 선택 필드와 연결된 라벨 -->
+                <label for="beverage-select" class="sb-label">
+                    3. 음료 선택
+                </label>
+                <!-- 
+                    <select>: 스타벅스 주요 인기 메뉴 4종 선택 드롭다운
+                -->
+                <select id="beverage-select" name="beverage" class="sb-select">
+                    <option value="아메리카노">☕ 아메리카노 (Americano)</option>
+                    <option value="카페라떼">🥛 카페라떼 (Caffè Latte)</option>
+                    <option value="카페모카">🍫 카페모카 (Caffè Mocha)</option>
+                    <option value="녹차라떼">🍵 녹차라떼 (Green Tea Latte)</option>
+                </select>
+            </div>
+
+            <!-- 4. 사이즈 선택 (스타벅스 PDP 스타일 라디오 버튼) -->
+            <div class="sb-field-group">
+                <!-- <fieldset> & <legend>: 연관된 라디오 옵션을 그룹화 -->
+                <fieldset class="sb-fieldset">
+                    <legend class="sb-legend">4. 사이즈 선택</legend>
+                    <div class="sb-size-grid">
+
+                        <!-- S (작은) 옵션 -->
+                        <label class="sb-size-option" for="size-s">
+                            <input type="radio" id="size-s" name="cupSize" value="S (작은)">
+                            <div class="sb-size-card">
+                                <span class="sb-size-icon">☕</span>
+                                <span class="sb-size-name">S (작은)</span>
+                                <span class="sb-size-desc">Tall / 355ml</span>
+                            </div>
+                        </label>
+
+                        <!-- M (보통) 옵션 - 기본 체크(checked) -->
+                        <label class="sb-size-option" for="size-m">
+                            <input type="radio" id="size-m" name="cupSize" value="M (보통)" checked>
+                            <div class="sb-size-card">
+                                <span class="sb-size-icon">🥤</span>
+                                <span class="sb-size-name">M (보통)</span>
+                                <span class="sb-size-desc">Grande / 473ml</span>
+                            </div>
+                        </label>
+
+                        <!-- L (큰) 옵션 -->
+                        <label class="sb-size-option" for="size-l">
+                            <input type="radio" id="size-l" name="cupSize" value="L (큰)">
+                            <div class="sb-size-card">
+                                <span class="sb-size-icon">🧊</span>
+                                <span class="sb-size-name">L (큰)</span>
+                                <span class="sb-size-desc">Venti / 591ml</span>
+                            </div>
+                        </label>
+
+                    </div>
+                </fieldset>
+            </div>
+
+            <!-- 5. 요청사항 입력칸 (여러 줄 텍스트) -->
+            <div class="sb-field-group">
+                <!-- <label>: 요청사항 텍스트에어리어 라벨 -->
+                <label for="special-requests" class="sb-label">
+                    5. 퍼스널 옵션 및 요청사항
+                </label>
+                <!-- 
+                    <textarea>: 여러 줄의 텍스트를 입력받는 입력창
+                -->
+                <textarea id="special-requests" name="specialRequests" class="sb-textarea" rows="4" placeholder="시럽 추가, 얼음 적게, 두유 변경 등 원하시는 요청사항을 자유롭게 적어주세요."></textarea>
+            </div>
+
+            <!-- 시각적 수평 구분선 -->
+            <hr class="sb-divider">
+
+            <!-- 6. 주문하기 버튼 & 7. 다시 작성 버튼 (50px Full-Pill) -->
+            <div class="sb-btn-row">
+                <!-- 
+                    <button type="submit">: 스타벅스 Green Accent(#00754A) 알약형 버튼 (엑셀 저장 실행)
+                -->
+                <button type="submit" class="sb-btn sb-btn-primary">
+                    <span>☕ 주문하기 (엑셀 저장)</span>
+                </button>
+
+                <!-- 
+                    <button type="reset">: 폼 초기화 알약형 아웃라인 버튼
+                -->
+                <button type="reset" class="sb-btn sb-btn-secondary">
+                    <span>다시 작성</span>
+                </button>
+            </div>
+
+        </form>
+
+        <!-- [하단 유틸리티 카드] 누적 엑셀 관리 -->
+        <div class="sb-utility-card">
+            <h3 class="sb-utility-title">📊 주문 내역 엑셀 관리</h3>
+            <p class="sb-utility-desc">작성된 모든 주문은 브라우저 및 로컬 엑셀 파일에 안전하게 기록됩니다.</p>
+            <button type="button" id="btn-download-all" class="sb-btn sb-btn-outline-green">
+                <span>📥 지금까지의 모든 누적 주문내역 엑셀 다운로드</span>
+            </button>
+            <div>
+                <button type="button" id="btn-clear-history" class="sb-btn-text-danger">
+                    누적 기록 초기화
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- 
+        [스타벅스 시그니처 Frap 플로팅 원형 버튼]
+        우측 하단에 고정 배치되어 클릭 시 주문 카드로 부드럽게 스크롤합니다.
+    -->
+    <button type="button" class="sb-frap-btn" id="btn-frap" title="주문서 상단으로 이동">
+        ☕
+    </button>
+
+    <!-- [푸터] House Green(#1E3932) 색상 적용 -->
+    <footer class="sb-footer">
+        <p><strong>VIBE CAFÉ × STARBUCKS INSPIRED DESIGN</strong></p>
+        <p class="sb-footer-highlight">Every cup crafted with passion & accuracy</p>
+        <p><small>© 2026 Vibe Cafe Project. All rights reserved. (Excel Order System)</small></p>
+    </footer>
+
+    <!-- 
+        [자바스크립트: 엑셀 저장 및 폼 처리 엔진]
+        UTF-8 with BOM(\uFEFF)을 적용하여 마이크로소프트 엑셀(Excel)에서 한글 깨짐 없이 곧바로 열립니다.
+    -->
+    <script>
+        // 1. 브라우저 localStorage 키 이름
+        const STORAGE_KEY = "vibe_cafe_orders";
+
+        // 2. 누적 주문 목록 불러오기
+        function getSavedOrders() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            return saved ? JSON.parse(saved) : [];
+        }
+
+        // 3. 엑셀 호환 CSV 파일 생성 및 다운로드 함수
+        function downloadOrdersAsExcel(orderList, fileName) {
+            if (!orderList || orderList.length === 0) {
+                alert("저장할 주문 내역이 없습니다.");
+                return;
+            }
+
+            const headers = ["주문번호", "주문일시", "고객명", "연락처", "주문음료", "사이즈", "요청사항"];
+            
+            // \uFEFF: Excel 한글 깨짐 방지 UTF-8 BOM
+            let csvContent = "\uFEFF";
+            csvContent += headers.join(",") + "\r\n";
+
+            orderList.forEach(function(item, index) {
+                const safeRequests = (item.specialRequests || "").replace(/"/g, '""');
+                const row = [
+                    index + 1,
+                    `"${item.orderDate}"`,
+                    `"${item.customerName}"`,
+                    `"${item.customerPhone}"`,
+                    `"${item.beverage}"`,
+                    `"${item.cupSize}"`,
+                    `"${safeRequests}"`
+                ];
+                csvContent += row.join(",") + "\r\n";
+            });
+
+            // Blob 객체 생성 및 가상 링크로 다운로드 트리거
+            const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", fileName);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+
+        // 4. 로컬 서버(server.py) 실행 시 폴더 내 '바이브카페_주문내역_누적.xlsx'에도 전송
+        function sendToServer(orderData) {
+            fetch("http://localhost:8000/api/order", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(orderData)
+            }).then(function(res) {
+                return res.json();
+            }).then(function(data) {
+                console.log("로컬 엑셀(.xlsx) 파일 저장 완료:", data);
+            }).catch(function() {
+                console.log("로컬 서버 미실행 (브라우저 엑셀 다운로드로 정상 저장)");
+            });
+        }
+
+        // 5. [주문하기] 폼 제출 이벤트
+        document.getElementById("order-form").addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            const customerName = document.getElementById("customer-name").value.trim();
+            const customerPhone = document.getElementById("customer-phone").value.trim() || "미입력";
+            const beverage = document.getElementById("beverage-select").value;
+
+            const selectedSizeElement = document.querySelector('input[name="cupSize"]:checked');
+            const cupSize = selectedSizeElement ? selectedSizeElement.value : "M (보통)";
+
+            const specialRequests = document.getElementById("special-requests").value.trim() || "없음";
+
+            const now = new Date();
+            const orderDate = now.getFullYear() + "-" +
+                String(now.getMonth() + 1).padStart(2, '0') + "-" +
+                String(now.getDate()).padStart(2, '0') + " " +
+                String(now.getHours()).padStart(2, '0') + ":" +
+                String(now.getMinutes()).padStart(2, '0') + ":" +
+                String(now.getSeconds()).padStart(2, '0');
+
+            const currentOrder = {
+                orderDate: orderDate,
+                customerName: customerName,
+                customerPhone: customerPhone,
+                beverage: beverage,
+                cupSize: cupSize,
+                specialRequests: specialRequests
+            };
+
+            // localStorage에 누적
+            const allOrders = getSavedOrders();
+            allOrders.push(currentOrder);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(allOrders));
+
+            // [엑셀 다운로드 실행]
+            const fileName = `바이브카페_주문내역_${customerName}_${now.getTime()}.csv`;
+            downloadOrdersAsExcel([currentOrder], fileName);
+
+            // 로컬 서버가 켜져 있다면 server.py 엑셀 파일(.xlsx)에도 동시 저장
+            sendToServer(currentOrder);
+
+            alert(`☕ [${customerName}님] 주문이 성공적으로 접수되었습니다!\n\n• 음료: ${beverage}\n• 사이즈: ${cupSize}\n• 엑셀 주문서 파일(${fileName})이 다운로드되었습니다.`);
+
+            document.getElementById("order-form").reset();
+        });
+
+        // 6. 누적 전체 엑셀 다운로드
+        document.getElementById("btn-download-all").addEventListener("click", function() {
+            const allOrders = getSavedOrders();
+            if (allOrders.length === 0) {
+                alert("아직 접수된 주문 내역이 없습니다.");
+                return;
+            }
+            const dateStr = new Date().toISOString().slice(0, 10);
+            downloadOrdersAsExcel(allOrders, `바이브카페_전체누적_주문내역_${dateStr}.csv`);
+        });
+
+        // 7. 누적 기록 초기화
+        document.getElementById("btn-clear-history").addEventListener("click", function() {
+            if (confirm("모든 누적 주문 기록을 초기화하시겠습니까?")) {
+                localStorage.removeItem(STORAGE_KEY);
+                alert("누적 주문 내역이 초기화되었습니다.");
+            }
+        });
+
+        // 8. Frap 플로팅 버튼 클릭 시 주문서로 부드럽게 스크롤
+        document.getElementById("btn-frap").addEventListener("click", function() {
+            document.getElementById("order-form").scrollIntoView({ behavior: "smooth" });
+        });
+    </script>
+</body>
+</html>
